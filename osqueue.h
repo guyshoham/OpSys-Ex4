@@ -1,18 +1,15 @@
 #ifndef __OS_QUEUE__
 #define __OS_QUEUE__
 
-
-typedef struct os_node
-{
+typedef struct os_node {
   struct os_node* next;
   void* data;
-}OSNode;
+} OSNode;
 
-typedef struct os_queue
-{
-  OSNode *head, *tail;
+typedef struct os_queue {
+  OSNode* head, * tail;
 
-}OSQueue;
+} OSQueue;
 
 OSQueue* osCreateQueue();
 
@@ -23,6 +20,5 @@ int osIsQueueEmpty(OSQueue* queue);
 void osEnqueue(OSQueue* queue, void* data);
 
 void* osDequeue(OSQueue* queue);
-
 
 #endif

@@ -1,11 +1,10 @@
 #include "osqueue.h"
 #include <stdlib.h>
 
-OSQueue* osCreateQueue()
-{
+OSQueue* osCreateQueue() {
   OSQueue* q = malloc(sizeof(OSQueue));
 
-  if(q == NULL)
+  if (q == NULL)
     return NULL;
 
   q->head = q->tail = NULL;
@@ -13,32 +12,27 @@ OSQueue* osCreateQueue()
   return q;
 }
 
-void osDestroyQueue(OSQueue* q)
-{
-  if(q == NULL)
+void osDestroyQueue(OSQueue* q) {
+  if (q == NULL)
     return;
 
-  while(osDequeue(q) != NULL);
+  while (osDequeue(q) != NULL);
 
   free(q);
 }
 
-int osIsQueueEmpty(OSQueue* q)
-{
+int osIsQueueEmpty(OSQueue* q) {
   return (q->tail == NULL && q->head == NULL);
 }
 
-void osEnqueue(OSQueue* q, void* data)
-{
+void osEnqueue(OSQueue* q, void* data) {
   OSNode* node = malloc(sizeof(OSNode));
-
 
   node->data = data;
   node->next = NULL;
 
-  if(q->tail == NULL)
-  {
-    q->head=q->tail=node;
+  if (q->tail == NULL) {
+    q->head = q->tail = node;
     return;
   }
 
@@ -47,14 +41,13 @@ void osEnqueue(OSQueue* q, void* data)
 
 }
 
-void* osDequeue(OSQueue* q)
-{
+void* osDequeue(OSQueue* q) {
   OSNode* previousHead;
   void* data;
 
   previousHead = q->head;
 
-  if(previousHead == NULL)
+  if (previousHead == NULL)
     return NULL;
 
   q->head = q->head->next;

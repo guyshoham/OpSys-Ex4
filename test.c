@@ -3,30 +3,23 @@
 #include "osqueue.h"
 #include "threadPool.h"
 
-
-void hello (void* a)
-{
+void hello(void* a) {
   printf("hello\n");
 }
 
-
-void test_thread_pool_sanity()
-{
+void test_thread_pool_sanity() {
   int i;
 
   ThreadPool* tp = tpCreate(5);
 
-  for(i=0; i<5; ++i)
-  {
-    tpInsertTask(tp,hello,NULL);
+  for (i = 0; i < 5; ++i) {
+    tpInsertTask(tp, hello, NULL);
   }
 
-  tpDestroy(tp,1);
+  tpDestroy(tp, 1);
 }
 
-
-int main()
-{
+int main() {
   test_thread_pool_sanity();
 
   return 0;
