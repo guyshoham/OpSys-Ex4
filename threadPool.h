@@ -9,9 +9,16 @@ typedef struct task {
 } Task;
 
 typedef struct thread_pool {
-  int numOfThreads;
-  int activeThreads;
+  int poolSize;
+  int taskCount;
+  int threadRunning;
+  int destroyed;
+  int shutdown;
+  int waitForTasks;
   OSQueue* queue;
+  pthread_t* threads;
+  pthread_mutex_t lock;
+  pthread_cond_t cond;
 
 } ThreadPool;
 
