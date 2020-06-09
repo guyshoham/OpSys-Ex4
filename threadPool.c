@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "threadPool.h"
-static void* runThread(void* threadpool);
+static void* runThread(void* pool);
 
 ThreadPool* tpCreate(int numOfThreads) {
   //allocate memory for ThreadPool
@@ -66,19 +66,19 @@ int tpInsertTask(ThreadPool* threadPool, void (* computeFunc)(void*), void* para
   return 0;
 }
 void tpDestroy(ThreadPool* threadPool, int shouldWaitForTasks) {
-  printf("tpDestroy\n");
+  //printf("tpDestroy\n");
   threadPool->shutdown = 1;
   threadPool->waitForTasks = shouldWaitForTasks;
 
   /* Wake up all worker threads */
   pthread_cond_broadcast(&(threadPool->cond));
-  printf("broadcast\n");
+  //printf("broadcast\n");
 
   int i;
   /* Join all worker thread */
   for (i = 1; i <= threadPool->poolSize; i++) {
     pthread_join(threadPool->threads[i - 1], NULL);
-    printf("join: %d\n", i);
+    //printf("join: %d\n", i);
   }
 
 
@@ -113,7 +113,7 @@ static void* runThread(void* pool) {
 
       task = osDequeue(tp->queue);
       tp->taskCount--;
-      printf("dequeue... %d\n", tp->taskCount);
+      //printf("dequeue... %d\n", tp->taskCount);
       pthread_mutex_unlock(&(tp->lock));
 
       //printf("executing...\n");
@@ -126,7 +126,7 @@ static void* runThread(void* pool) {
     while (!osIsQueueEmpty(tp->queue)) {
       task = osDequeue(tp->queue);
       tp->taskCount--;
-      printf("dequeue... %d\n", tp->taskCount);
+      //printf("dequeue... %d\n", tp->taskCount);
       pthread_mutex_unlock(&(tp->lock));
 
       //printf("executing...\n");
@@ -140,7 +140,5 @@ static void* runThread(void* pool) {
 
   tp->threadRunning--;
 
-  printf("shutting down thread\n");
+  //printf("shutting down thread...\n");
 }
-
-
