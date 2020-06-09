@@ -5,7 +5,7 @@
 #include "threadPool.h"
 
 void hello(void* a) {
-  sleep(5);
+  sleep(4);
   printf("hello %d\n", (int) a);
 }
 
