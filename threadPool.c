@@ -16,7 +16,6 @@ ThreadPool* tpCreate(int numOfThreads) {
   tp->poolSize = numOfThreads;
   tp->taskCount = 0;
   tp->isDestroy = 0;
-  tp->threadsRunning = 0;
   tp->waitForTasks = 0;
   pthread_cond_init(&tp->cond, NULL);
 
@@ -31,7 +30,6 @@ ThreadPool* tpCreate(int numOfThreads) {
       tpDestroy(tp, 0);
       return NULL;
     }
-    tp->threadsRunning++;
   }
 
   return tp;
@@ -122,6 +120,4 @@ static void* runThread(void* pool) {
   }
 
   pthread_mutex_unlock(&(tp->lock));
-
-  tp->threadsRunning--;
 }

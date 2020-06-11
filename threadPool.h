@@ -11,7 +11,6 @@ typedef struct task {
 typedef struct thread_pool {
   int poolSize;
   int taskCount;
-  int threadsRunning;
   int isDestroy;
   int waitForTasks;
   OSQueue* queue;
