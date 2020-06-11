@@ -28,19 +28,16 @@ ThreadPool* tpCreate(int numOfThreads) {
   }
 
   int i;
-  for (i = 1; i <= numOfThreads; i++) {
+  for (i = 0; i < numOfThreads; i++) {
     if (pthread_create(&(tp->threads[i]), NULL, runThread, (void*) tp) != 0) {
       tpDestroy(tp, 0);
       exit(-1);
-    } else {
-      printf("thread %d is active\n", i);
     }
   }
 
   return tp;
 }
 int tpInsertTask(ThreadPool* threadPool, void (* computeFunc)(void*), void* param) {
-
   //allocate memory for Task
   Task* task = (Task*) malloc(sizeof(Task));
   if (task == NULL) {
@@ -50,7 +47,6 @@ int tpInsertTask(ThreadPool* threadPool, void (* computeFunc)(void*), void* para
 
   task->func = computeFunc;
   task->param = param;
-
 
   //lock pool while adding task
   if (pthread_mutex_lock(&(threadPool->lock)) != 0) {
@@ -81,20 +77,20 @@ void tpDestroy(ThreadPool* threadPool, int shouldWaitForTasks) {
 
   /* Wake up all worker threads */
   if (pthread_cond_broadcast(&(threadPool->cond)) != 0) {
-    printf("error test\n");
     exit(-1);
   }
 
   int i;
   /* Join all worker thread */
   for (i = 0; i < threadPool->poolSize; i++) {
-    pthread_join(threadPool->threads[i], NULL);
+    if (pthread_join(threadPool->threads[i], NULL) != 0) {
+      exit(-1);
+    }
   }
 
   osDestroyQueue(threadPool->queue);
 
   if (pthread_cond_destroy(&threadPool->cond) != 0) {
-    printf("error test\n");
     exit(-1);
   }
 

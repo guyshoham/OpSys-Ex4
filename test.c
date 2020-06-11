@@ -12,15 +12,14 @@ void hello(void* a) {
 void test_thread_pool_sanity() {
   int i;
 
-  ThreadPool* tp = tpCreate(2);
+  ThreadPool* tp = tpCreate(5);
 
-  for (i = 1; i <= 4; ++i) {
+  for (i = 1; i <= 40; ++i) {
     tpInsertTask(tp, hello, (void*) i);
   }
   sleep(1);
 
   tpDestroy(tp, 1);
-  printf("done\n");
 }
 
 int main() {
