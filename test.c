@@ -5,21 +5,22 @@
 #include "threadPool.h"
 
 void hello(void* a) {
-  sleep(4);
+  sleep(1);
   printf("hello %d\n", (int) a);
 }
 
 void test_thread_pool_sanity() {
   int i;
 
-  ThreadPool* tp = tpCreate(5);
+  ThreadPool* tp = tpCreate(2);
 
-  for (i = 1; i <= 10; ++i) {
+  for (i = 1; i <= 4; ++i) {
     tpInsertTask(tp, hello, (void*) i);
   }
-  sleep(2);
+  sleep(1);
 
-  tpDestroy(tp, 0);
+  tpDestroy(tp, 1);
+  printf("done\n");
 }
 
 int main() {
