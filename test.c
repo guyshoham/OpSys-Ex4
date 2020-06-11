@@ -5,7 +5,7 @@
 #include "threadPool.h"
 
 void hello(void* a) {
-  sleep(4);
+  sleep(1);
   printf("hello %d\n", (int) a);
 }
 
@@ -14,12 +14,12 @@ void test_thread_pool_sanity() {
 
   ThreadPool* tp = tpCreate(5);
 
-  for (i = 1; i <= 10; ++i) {
+  for (i = 1; i <= 40; ++i) {
     tpInsertTask(tp, hello, (void*) i);
   }
-  sleep(2);
+  sleep(1);
 
-  tpDestroy(tp, 0);
+  tpDestroy(tp, 1);
 }
 
 int main() {
