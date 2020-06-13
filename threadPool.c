@@ -1,5 +1,3 @@
-// Guy Shoham 302288444
-
 #include <pthread.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -10,8 +8,10 @@ static void* runThread(void* pool);
 ThreadPool* tpCreate(int numOfThreads) {
   //allocate memory for ThreadPool
   ThreadPool* tp = (ThreadPool*) malloc(sizeof(ThreadPool));
-  if (tp == NULL)
+  if (tp == NULL) {
+    perror("thread pool allocation failed ");
     exit(-1);
+  }
 
   tp->queue = osCreateQueue();
   tp->poolSize = numOfThreads;
@@ -24,6 +24,7 @@ ThreadPool* tpCreate(int numOfThreads) {
   tp->threads = (pthread_t*) malloc(numOfThreads * sizeof(pthread_t));
   if (tp->threads == NULL) {
     tpDestroy(tp, 0);
+    perror("threads array allocation failed ");
     exit(-1);
   }
 
@@ -31,6 +32,7 @@ ThreadPool* tpCreate(int numOfThreads) {
   for (i = 0; i < numOfThreads; i++) {
     if (pthread_create(&(tp->threads[i]), NULL, runThread, (void*) tp) != 0) {
       tpDestroy(tp, 0);
+      perror("pthread_create operation failed ");
       exit(-1);
     }
   }
@@ -42,6 +44,7 @@ int tpInsertTask(ThreadPool* threadPool, void (* computeFunc)(void*), void* para
   Task* task = (Task*) malloc(sizeof(Task));
   if (task == NULL) {
     tpDestroy(threadPool, 0);
+    perror("task allocation failed ");
     exit(-1);
   }
 
@@ -51,6 +54,7 @@ int tpInsertTask(ThreadPool* threadPool, void (* computeFunc)(void*), void* para
   //lock pool while adding task
   if (pthread_mutex_lock(&(threadPool->lock)) != 0) {
     tpDestroy(threadPool, 0);
+    perror("pthread_mutex_lock operation failed ");
     exit(-1);
   }
 
@@ -61,11 +65,13 @@ int tpInsertTask(ThreadPool* threadPool, void (* computeFunc)(void*), void* para
   //unlock pool
   if (pthread_mutex_unlock(&(threadPool->lock)) != 0) {
     tpDestroy(threadPool, 0);
+    perror("pthread_mutex_unlock operation failed ");
     exit(-1);
   }
 
   if (pthread_cond_signal(&threadPool->cond) != 0) {
     tpDestroy(threadPool, 0);
+    perror("pthread_cond_signal operation failed ");
     exit(-1);
   }
 
@@ -77,6 +83,7 @@ void tpDestroy(ThreadPool* threadPool, int shouldWaitForTasks) {
 
   /* Wake up all worker threads */
   if (pthread_cond_broadcast(&(threadPool->cond)) != 0) {
+    perror("pthread_cond_broadcast operation failed ");
     exit(-1);
   }
 
@@ -84,6 +91,7 @@ void tpDestroy(ThreadPool* threadPool, int shouldWaitForTasks) {
   /* Join all worker thread */
   for (i = 0; i < threadPool->poolSize; i++) {
     if (pthread_join(threadPool->threads[i], NULL) != 0) {
+      perror("pthread_join operation failed ");
       exit(-1);
     }
   }
@@ -91,6 +99,7 @@ void tpDestroy(ThreadPool* threadPool, int shouldWaitForTasks) {
   osDestroyQueue(threadPool->queue);
 
   if (pthread_cond_destroy(&threadPool->cond) != 0) {
+    perror("pthread_cond_destroy operation failed ");
     exit(-1);
   }
 
@@ -106,11 +115,13 @@ static void* runThread(void* pool) {
   while (!tp->isDestroy) {
     if (pthread_mutex_lock(&(tp->lock)) != 0) {
       tpDestroy(tp, 0);
+      perror("pthread_mutex_lock operation failed ");
       exit(-1);
     }
 
     if (pthread_cond_wait(&tp->cond, &tp->lock) != 0) {
       tpDestroy(tp, 0);
+      perror("pthread_cond_wait operation failed ");
       exit(-1);
     }
 
@@ -120,6 +131,7 @@ static void* runThread(void* pool) {
       tp->taskCount--;
       if (pthread_mutex_unlock(&(tp->lock)) != 0) {
         tpDestroy(tp, 0);
+        perror("pthread_mutex_unlock operation failed ");
         exit(-1);
       }
 
@@ -136,6 +148,7 @@ static void* runThread(void* pool) {
     tp->taskCount--;
     if (pthread_mutex_unlock(&(tp->lock)) != 0) {
       tpDestroy(tp, 0);
+      perror("pthread_mutex_unlock operation failed ");
       exit(-1);
     }
 
@@ -147,12 +160,14 @@ static void* runThread(void* pool) {
 
     if (pthread_mutex_lock(&(tp->lock)) != 0) {
       tpDestroy(tp, 0);
+      perror("pthread_mutex_lock operation failed ");
       exit(-1);
     }
   }
 
   if (pthread_mutex_unlock(&(tp->lock)) != 0) {
     tpDestroy(tp, 0);
+    perror("pthread_mutex_unlock operation failed ");
     exit(-1);
   }
   return NULL;
